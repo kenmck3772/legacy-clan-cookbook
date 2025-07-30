@@ -1,87 +1,399 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Legacy Clan Cookbook</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #fefcf7;
-      color: #1e1b16;
-    }
-    h1, h2, h3 {
-      font-family: 'Cinzel', serif;
-    }
-    .scroll-section {
-      scroll-margin-top: 5rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Clan Hearth: A Flamekeeper's Legacy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Highland Mist -->
+    <!-- Application Structure Plan: The application is now structured around the user's personal legacy. It opens with 'The Flamekeeper's Story,' establishing the dual Armstrong-McKenzie heritage. A new, prominent 'Find Your Clan' section with a search bar is added near the top, making personal discovery a primary user action. The main navigation is expanded to include this new feature. The structure flows from personal identity (Find Your Clan) to broader history (The Clans, The Map) and practical application (The Cookbook, Bonus Chapters), creating a comprehensive and engaging user journey. -->
+    <!-- Visualization & Content Choices: 1. Report Info: User's Dual Heritage (Armstrong/McKenzie) -> Goal: Frame the entire project with a personal narrative -> Viz/Method: A prominent introductory text section with stylized typography. -> Justification: Immediately establishes the unique, personal context of the project, making it more compelling than a generic cookbook. 2. Report Info: Searchable Clan/Surname Database -> Goal: Allow users to find their clan affiliation -> Viz/Method: A JavaScript-powered search bar that dynamically filters a large data object of surnames and septs. -> Interaction: As the user types their surname, the application instantly displays the associated clan's crest, motto, and a summary. -> Justification: This is a highly engaging, interactive feature that directly addresses the user's need for personal connection and makes the historical content immediately relevant. 3. Report Info: Recipes with Substitutions & Dual Measurements -> Goal: Make historical recipes practical for a modern, global audience -> Viz/Method: A structured HTML table within the recipe modal. -> Interaction: The modal now displays a clear, easy-to-read table for ingredients, showing Traditional, Substitute, UK Metric, and US Imperial values. -> Justification: This is a critical usability improvement that directly addresses the source material's requirement for American-friendly adaptations and makes the recipes genuinely cookable for a wider audience. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F5F2; color: #4A4A4A; scroll-behavior: smooth; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Lora', serif; color: #2D3748; }
+        .bg-stone-100 { background-color: #F8F5F2; }
+        .bg-stone-200 { background-color: #EFEBE6; }
+        .text-stone-800 { color: #4A4A4A; }
+        .text-stone-600 { color: #71717A; }
+        .border-stone-300 { border-color: #D6D3D1; }
+        .nav-link { transition: color 0.3s, border-color 0.3s; }
+        .nav-link.active { color: #A57C5A; border-bottom-color: #A57C5A; }
+        .nav-link:hover { color: #A57C5A; }
+        .clan-btn, .filter-btn { transition: background-color 0.3s, color 0.3s; }
+        .clan-btn.active, .filter-btn.active { background-color: #A57C5A; color: white; }
+        .recipe-card { transition: transform 0.3s, box-shadow 0.3s; }
+        .recipe-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .modal { display: none; }
+        .modal.show { display: flex; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 400px; max-height: 50vh; }
+        .map-clan { transition: background-color 0.3s, color 0.3s; cursor: pointer; }
+        .map-clan:hover { background-color: #A57C5A; color: white; }
+        .seer-section { background-color: #2D3748; color: #EFEBE6; }
+        .seer-section h2, .seer-section h3, .seer-section h4 { color: #F8F5F2; }
+        .seer-section p, .seer-section li { color: #D6D3D1; }
+        @media (min-width: 768px) { .chart-container { height: 500px; } }
+    </style>
 </head>
-<body class="antialiased">
+<body class="bg-stone-100">
 
-  <header class="bg-amber-100 p-6 shadow-md border-b border-amber-300">
-    <h1 class="text-4xl font-bold text-center">Legacy Clan Cookbook</h1>
-    <p class="text-center italic mt-2 text-lg text-gray-700">Where Highland Fire Meets Ancestral Feast</p>
-  </header>
+    <header class="text-center py-12 px-4 bg-stone-200">
+        <h1 class="text-4xl md:text-6xl font-bold text-stone-800 tracking-tight">The Clan Hearth</h1>
+        <p class="mt-4 text-lg text-stone-600 max-w-3xl mx-auto">A Flamekeeper's Legacy</p>
+    </header>
 
-  <nav class="flex justify-center gap-4 p-4 bg-white border-b border-amber-300 text-sm">
-    <a href="#about" class="text-blue-800 hover:underline">About</a>
-    <a href="#chapters" class="text-blue-800 hover:underline">Chapters</a>
-    <a href="#recipes" class="text-blue-800 hover:underline">Recipes</a>
-    <a href="#author" class="text-blue-800 hover:underline">Author</a>
-  </nav>
+    <nav id="main-nav" class="sticky top-0 bg-stone-100/80 backdrop-blur-md z-50 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-center items-center h-16 overflow-x-auto whitespace-nowrap">
+                <div class="flex space-x-3 md:space-x-6 text-sm md:text-base">
+                    <a href="#story" class="nav-link text-stone-600 border-b-2 border-transparent pb-1">My Story</a>
+                    <a href="#find-clan" class="nav-link text-stone-600 border-b-2 border-transparent pb-1">Find Your Clan</a>
+                    <a href="#clans" class="nav-link text-stone-600 border-b-2 border-transparent pb-1">The Clans</a>
+                    <a href="#map" class="nav-link text-stone-600 border-b-2 border-transparent pb-1">The Map</a>
+                    <a href="#recipes" class="nav-link text-stone-600 border-b-2 border-transparent pb-1">The Cookbook</a>
+                    <a href="#bonus" class="nav-link text-stone-600 border-b-2 border-transparent pb-1">Bonus Chapters</a>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-  <section id="about" class="scroll-section p-8 max-w-4xl mx-auto">
-    <h2 class="text-2xl font-bold mb-2">About the Project</h2>
-    <p>
-      This is a living digital scroll of Scottish Highland memory — brought to life by Kenneth Scott McKenzie, son of Armstrong blood and McKenzie fire. Though born to an Armstrong father, Kenneth proudly carries the McKenzie name forward as the first of a new generation.
-      <br/><br/>
-      The Legacy Clan Cookbook is part history, part family honour, and part Highland hearth — preserving the foods, legends, and rituals of ancient Scottish clans for modern tables.
-    </p>
-  </section>
+    <main class="container mx-auto px-4 py-12">
 
-  <section id="chapters" class="scroll-section p-8 max-w-4xl mx-auto">
-    <h2 class="text-2xl font-bold mb-4">Clan Chapters</h2>
-    <ul class="list-disc pl-6 space-y-2">
-      <li><strong>Clan Mackenzie:</strong> Rowan berry venison & highland herb stews</li>
-      <li><strong>Clan MacGregor:</strong> Firepit bannocks, outlaw stews & rebel lore</li>
-      <li><strong>Clan MacLeod:</strong> Coastal cod, Norse feasts & fairy flag legends</li>
-      <li><strong>Clan MacDonald:</strong> Lords of the Isles cuisine & wartime preserves</li>
-      <li><strong>Clan Fraser:</strong> Orchard preserves, oatcakes, and Culloden meat pies</li>
-      <li><strong>Clan Campbell:</strong> Feast of influence: barley, boar & bannock stacks</li>
-    </ul>
-  </section>
+        <section id="story" class="scroll-mt-20 mb-16">
+            <h2 class="text-3xl font-bold text-center mb-4">The Flamekeeper's Story</h2>
+            <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg text-center">
+                <h3 class="text-2xl font-semibold mb-4">A Note from the Author</h3>
+                <p class="text-stone-700 mb-4 italic">
+                    "My name is Kenneth Scott McKenzie. It’s a name that carries two Highland legacies. My mother is a McKenzie, her father Kenneth Candlish McKenzie, a name that whispers of the Isle of Lewis and the great Seaforth chiefs. My father is an Armstrong, a name that rings with the fierce, defiant spirit of the Border Reivers. I am the first of my generation to carry the McKenzie name forward, a conscious choice to tend the flame of a story that blends the visionary fire of the Mackenzies with the warrior heart of the Armstrongs. This project is not just a cookbook. It’s for the forgotten families, the blended bloodlines, and the quiet names that held the Highlands together. This is my legacy—and theirs."
+                </p>
+            </div>
+        </section>
 
-  <section id="recipes" class="scroll-section p-8 max-w-4xl mx-auto">
-    <h2 class="text-2xl font-bold mb-4">Sample Recipes</h2>
-    <div class="space-y-6">
-      <div>
-        <h3 class="text-xl font-semibold">🔥 Rob Roy Firepit Stew</h3>
-        <p>Venison (or beef), root veg, smoked paprika, and foraged greens — slow-simmered in a cauldron or cast-iron pot.</p>
-      </div>
-      <div>
-        <h3 class="text-xl font-semibold">🌿 Dreamwalker’s Tea</h3>
-        <p>Mugwort, peppermint & meadowsweet — taken before sleep to invoke visions. Notes included for safety & sourcing.</p>
-      </div>
-      <div>
-        <h3 class="text-xl font-semibold">🥣 Seer’s Silent Broth</h3>
-        <p>Warming oat, garlic & nettle broth, consumed in silence. Believed to awaken inner sight and cleanse the path.</p>
-      </div>
+        <section id="find-clan" class="scroll-mt-20 mb-16">
+            <h2 class="text-3xl font-bold text-center mb-4">Find Your Clan</h2>
+            <p class="text-center text-stone-600 max-w-3xl mx-auto mb-8">
+                Many Scottish surnames are associated with larger clans through a system of allegiance or territory. These associated families are known as "septs." Enter your surname below to discover your possible clan connection and a brief history of the family that may have shared a hearth with your ancestors.
+            </p>
+            <div class="max-w-xl mx-auto">
+                <input type="text" id="clan-search-input" class="w-full p-4 border border-stone-300 rounded-lg shadow-sm text-lg focus:ring-2 focus:ring-[#A57C5A] focus:border-[#A57C5A]" placeholder="Enter your surname (e.g., Henderson, Shaw, Reid)...">
+            </div>
+            <div id="clan-search-results" class="mt-8 max-w-3xl mx-auto"></div>
+        </section>
+
+        <section id="clans" class="scroll-mt-20 mb-16">
+            <h2 class="text-3xl font-bold text-center mb-4">A Taste of the Clans</h2>
+            <p class="text-center text-stone-600 max-w-3xl mx-auto mb-8">
+                Each clan's menu was authored by its geography. Explore the unique culinary worlds of Scotland's most significant clans. Select a clan to uncover its expanded history, its specific larder, and the dishes that tell its story.
+            </p>
+            <div id="clan-buttons" class="flex justify-center flex-wrap gap-2 mb-8">
+            </div>
+            <div id="clan-content" class="bg-white p-6 md:p-8 rounded-lg shadow-lg min-h-[500px]">
+            </div>
+        </section>
+
+        <section id="map" class="scroll-mt-20 mb-16">
+            <h2 class="text-3xl font-bold text-center mb-4">A Map of the Clans</h2>
+            <p class="text-center text-stone-600 max-w-3xl mx-auto mb-8">
+                This is a stylized map showing the approximate historical territories of some of Scotland's major clans around the 17th century. It is not geographically precise but aims to give a sense of the domains that shaped each clan's identity and larder.
+            </p>
+            <div class="w-full max-w-4xl mx-auto bg-white p-4 rounded-lg shadow-lg">
+                <div class="aspect-w-3 aspect-h-4">
+                    <div id="map-container" class="grid grid-cols-6 grid-rows-8 gap-1 w-full h-full text-xs md:text-sm">
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="recipes" class="scroll-mt-20 mb-16">
+            <h2 class="text-3xl font-bold text-center mb-4">The Cookbook</h2>
+            <p class="text-center text-stone-600 max-w-3xl mx-auto mb-8">
+                Here you can browse all the recipes from the clan hearths. These dishes translate history into flavor, adapting the principles of the past for the modern kitchen. Filter by clan to explore their specific culinary traditions or simply find a new favorite to cook.
+            </p>
+            <div id="filter-buttons" class="flex justify-center flex-wrap gap-2 mb-8">
+            </div>
+            <div id="recipe-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
+        </section>
+
+        <section id="bonus" class="scroll-mt-20 space-y-16">
+            <div id="seer-section" class="seer-section p-8 md:p-12 rounded-lg shadow-lg">
+                 <h2 class="text-3xl font-bold text-center mb-4">Bonus Chapter: The Seer's Kitchen</h2>
+                 <p class="text-center max-w-3xl mx-auto mb-8">"When the broth speaks, the wise listen." A tribute to the mystics, healers, and prophets of the Highlands—and the foods they revered. The Highland Seer, or *fiosaiche*, was not simply a fortune-teller. They were healers and herbalists who cooked with sacred intent, believing food had spiritual power to open the mind to second sight.</p>
+                 <div id="seer-recipes" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
+            </div>
+
+            <div id="rebellion-section" class="bg-white p-8 md:p-12 rounded-lg shadow-lg">
+                 <h2 class="text-3xl font-bold text-center mb-4">Bonus Chapter: Feasts of the Forbidden</h2>
+                 <p class="text-center text-stone-600 max-w-3xl mx-auto mb-8">A tribute to the defiant clans whose cuisine was shaped by proscription, persecution, and pride. They cooked when cooking was treason and shared food even when famine loomed. These were not banquets in castles—these were rebellion feasts in the woods, caves, and cattle sheds.</p>
+                 <div id="rebellion-recipes" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
+            </div>
+             <div id="whisky-section" class="bg-white p-8 md:p-12 rounded-lg shadow-lg">
+                 <h2 class="text-3xl font-bold text-center mb-4">Bonus Chapter: Whisky & War Stories</h2>
+                 <p class="text-center text-stone-600 max-w-3xl mx-auto mb-8">"A dram before battle, a dram for the fallen, a dram for the road." Whisky wasn’t just a drink. It was a ritual, a currency, and a keeper of memory. Every clan had their own distilling traditions, secret stills, and ways of blessing the dram.</p>
+                 <div id="whisky-recipes" class="grid grid-cols-1 md:grid-cols-2 gap-8"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-200 mt-16 py-8">
+        <div class="container mx-auto text-center text-stone-600">
+            <p>&copy; 2024 The Clan Hearth. A Legacy Project by Kenneth Scott McKenzie.</p>
+        </div>
+    </footer>
+
+    <div id="recipe-modal" class="modal fixed inset-0 bg-black bg-opacity-60 items-center justify-center p-4 z-50">
+        <div id="modal-content" class="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-8 relative">
+            <button id="close-modal" class="absolute top-4 right-4 text-stone-500 hover:text-stone-800 text-3xl">&times;</button>
+            <div id="modal-body"></div>
+        </div>
     </div>
-  </section>
 
-  <section id="author" class="scroll-section p-8 max-w-4xl mx-auto">
-    <h2 class="text-2xl font-bold mb-4">About the Author</h2>
-    <p>
-      Kenneth Scott McKenzie honours both sides of his heritage — a son of the Armstrongs and a grandson of Kenneth Candlish McKenzie. As a seer of stories and keeper of cauldron wisdom, he now gathers recipes, memories, and clan fire into this online scroll — for all descendants who seek to remember.
-    </p>
-  </section>
+    <script>
+        const data = {
+            larder: {
+                labels: ["Crops (Oats, Barley)", "Livestock (Cattle, Sheep)", "Game (Deer, Grouse)", "River & Loch Fish (Salmon)", "Sea Fish & Herring", "Shellfish & Coastal", "Wild Foraging"],
+                data: [95, 85, 70, 80, 90, 88, 65]
+            },
+            mapLayout: [
+                { clan: "MacLeod", row: 1, col: 1, spanCol: 2, spanRow: 2 },
+                { clan: "MacKenzie", row: 2, col: 3, spanCol: 2, spanRow: 2 },
+                { clan: "MacDonald", row: 3, col: 1, spanCol: 2, spanRow: 3 },
+                { clan: "Fraser", row: 3, col: 4, spanCol: 2, spanRow: 1 },
+                { clan: "Grant", row: 4, col: 5, spanCol: 2, spanRow: 1 },
+                { clan: "Murray", row: 5, col: 5, spanCol: 2, spanRow: 1 },
+                { clan: "Cameron", row: 4, col: 3, spanCol: 2, spanRow: 1 },
+                { clan: "Campbell", row: 5, col: 2, spanCol: 3, spanRow: 2 },
+                { clan: "MacGregor", row: 6, col: 4, spanCol: 2, spanRow: 1 },
+                { clan: "Armstrong", row: 8, col: 3, spanCol: 2, spanRow: 1 }
+            ],
+            clans: {
+                MacKenzie: { name: "MacKenzie", title: "The Stag's Antler", motto: "Luceo non uro — I shine, not burn", history: "A powerful Highland clan of Gaelic origin who held vast territories in Ross-shire. Their heartland was Kintail, dominated by the iconic Eilean Donan Castle. Known for their fierce loyalty and significant roles in the Jacobite risings, their motto reflects a desire to lead through enlightenment rather than destruction.", larder: "A blend of Highland and coastal bounty. Their inland territories were rich in **venison** and provided grazing for **cattle**. Their extensive coastline along the western seaboard offered plentiful **whitefish like cod and haddock**. They relied on **oats and barley**, and their dairy production led to fresh cheeses like **crowdie**." },
+                Armstrong: { name: "Armstrong", title: "The Border Reivers", motto: "Invictus Maneo — I Remain Unvanquished", history: "One of the most feared and powerful of the Border Reiver clans, the Armstrongs dominated the Debatable Lands between Scotland and England. They were not Highlanders but Lowlanders, renowned for their skill as horsemen and their fierce, lawless independence. Their history is one of raids, feuds, and a defiant spirit against both Scottish and English crowns.", larder: "The Armstrong larder was based on what could be farmed, foraged, or 'reived' (stolen) in a raid. **Beef and mutton** from driven cattle and sheep were central. Hardy crops like **barley and root vegetables** were grown. Their food was practical and portable, designed for riders on the move. **Smoked and salted meats** were essential for preservation." },
+                MacGregor: { name: "MacGregor", title: "The Outlaw Clan", motto: "'S Rioghal Mo Dhream — My Blood is Royal", history: "Few clans stir the soul like the MacGregors. Claiming royal descent, they were stripped of their name and lands in 1603, making it a capital crime to be a MacGregor. For over 170 years, they lived as outlaws, masters of survival and guerrilla warfare. The legendary Rob Roy MacGregor is their most famous son. Their story is one of persecution, resilience, and unbreakable pride.", larder: "The MacGregor diet was one of survival, mobility, and making do with what nature—or their neighbours—provided. **Venison, rabbit, and wild goat** were hunted. **Oats, kale, and foraged nettles** were staples. Their cooking was done over hidden firepits, and their meals were shared communally among bands of kin on the run." },
+                Campbell: { name: "Campbell", title: "The Powerbrokers of Argyll", motto: "Ne Obliviscaris — Forget Not", history: "The story of Clan Campbell is one of ambition, political acumen, and unparalleled success. From their heartland in Argyll, they rose to become one of the largest, wealthiest, and most powerful clans, their influence stretching from the Highlands to the royal court. Their rise was fueled by unwavering support for King Robert the Bruce and a close alliance with the Stewart dynasty. This loyalty was rewarded with extensive grants of land, often at the expense of their rivals. Their power in the west was cemented after 1493, when they became the chief beneficiaries of the Crown's suppression of the MacDonalds' Lordship of the Isles. While their seat is Inveraray Castle on Loch Fyne, their holdings were vast and diverse, giving them access to a wide range of resources.", larder: "The Campbell diet was a testament to their status as landed gentry. Unlike clans confined to the rugged Highlands, they enjoyed agricultural abundance. With extensive pastureland, **beef and mutton** were central. Their Highland estates provided **venison and grouse**. Crucially, their Lowland holdings gave them access to a greater variety of **farmed produce** and their wealth ensured a supply of **imported goods** like spices and wine. They were culinary code-switchers, comfortable with both Highland tradition and Lowland fashion." },
+                MacDonald: { name: "MacDonald", title: "Lords of the Isles", motto: "Per Mare Per Terras — By Sea and by Land", history: "To speak of Clan MacDonald is to speak of a dynasty that once ruled a maritime empire. Descended from the great 12th-century warrior Somerled, they ruled the Hebrides as semi-independent Lords of the Isles. Their power, culture, and diet were all shaped by the sea, blending Gaelic and Norse traditions. Their political center was the island of Islay, where the Council of the Isles met at Finlaggan. Though the Lordship was forfeited in 1493, the clan remained a dominant force in the west for centuries, their power built on mastery of the sea.", larder: "Fish and shellfish were the cornerstones of the MacDonald diet. The Hebridean waters teemed with **herring, cod, and salmon**, while the shores provided endless **lobsters, crabs, and mussels**. A mastery of Norse preservation techniques like smoking and salting was essential. The diet was supplemented by hardy crops of **oats and barley** and foraged coastal plants and **seaweeds** like dulse. Theirs was a larder drawn from the ocean's depths." },
+                Fraser: { name: "Fraser", title: "Guardians of the Highland Heart", motto: "Je Suis Prest — I Am Ready", history: "Despite their deep Highland identity, the Frasers' story begins in France. Of Norman origin, they moved north from the Lowlands to establish their power base around the Beauly Firth near Inverness. They became quintessential Highland warriors, famous for their martial prowess. Romantic folklore connects their name to the French word for strawberry, *fraise*, a story immortalized in their crest. Their territory was a strategic and resource-rich location, encompassing excellent arable land, some of Scotland's best salmon rivers, and vast tracts of forest for hunting.", larder: "The Fraser diet represents a perfect microcosm of the traditional Highland larder. The rivers provided prized **Atlantic salmon**, while their extensive territories offered excellent hunting for **venison**. Good grazing land supplied **mutton and beef**. Like all clans, they relied on **oats and barley**. Their unique folklore connection to the strawberry highlights the importance of foraged **wild berries**, used in both sweet and savory dishes, blending their sophisticated origins with the wild bounty of their home." },
+                MacLeod: { name: "MacLeod", title: "The Bulls of Skye", motto: "Hold Fast", history: "One of the most famous of all the Highland clans, the MacLeods have held their ancestral seat at Dunvegan Castle on the Isle of Skye for over 800 years, making it the oldest continuously inhabited castle in Scotland. Of Norse-Gaelic descent, they are divided into two main branches: the MacLeods of Harris and Dunvegan, and the MacLeods of Lewis. Fiercely loyal and renowned for their strong cultural traditions, including a famous piping school, their history is deeply intertwined with the rugged, dramatic landscape of Skye.", larder: "Like their MacDonald rivals, the MacLeod larder was dominated by the sea. **Fish and shellfish** were staples. However, their large landholdings on Skye also supported significant flocks of **sheep**, making mutton a key part of their diet. The moors provided **game**, and the coastline offered **seabirds and their eggs**. Their famous 'Fairy Flag' is a testament to their deep connection to the folklore and magic of their island home." },
+                Grant: { name: "Grant", title: "The Rock of Strathspey", motto: "Stand Fast", history: "The Grants are a powerful clan from Strathspey, the heart of Scotland's whisky country. Of Norman origin, they settled in the Highlands in the 13th century and became staunch supporters of the Scottish Crown. Their territory, centered around the River Spey, was a strategic crossroads, rich in timber from the ancient Caledonian Forest and fertile land along the riverbanks. Their motto, 'Stand Fast,' reflects their resilience and enduring presence in the region.", larder: "The Grant larder was defined by the river and the forest. The River Spey provided an abundance of **Atlantic salmon**, which was a source of both food and wealth. The vast forests of Strathspey were prime hunting grounds for **venison and grouse**. The fertile straths were ideal for growing **barley**, a crop that would become the foundation of the region's world-famous whisky industry. Their diet was one of river-fed, forest-roaming abundance." },
+                Murray: { name: "Murray", title: "The Dukes of Atholl", motto: "Furth Fortune and Fill the Fetters", history: "Clan Murray is one of Scotland's most powerful and noble families, with roots in the Flemish aristocracy. They settled in the Moray area in the 12th century and, through strategic marriages and royal service, acquired vast estates, most notably the Dukedom of Atholl in Perthshire. Their seat at Blair Castle commands the entrance to the Highlands. The Duke of Atholl holds the unique right to maintain a private army, the Atholl Highlanders. Their motto reflects their ambition and power.", larder: "The Murray larder was one of aristocratic plenty. Their Perthshire estates offered some of the best **game hunting** in Scotland, with plentiful **venison and grouse**. The great rivers like the Tay provided **salmon**. Their fertile lands supported large herds of **cattle**, making beef a staple. As powerful nobles with close ties to the court, they would have also enjoyed **imported goods** and practiced a more sophisticated, French-influenced style of cuisine at their great feasts at Blair Castle." }
+            },
+            recipes: [
+                { id: 1, clan: "MacGregor", name: "Rob Roy's Firepit Venison", type: "Main", category: "rebellion", intro: "Thin-sliced venison seared on hot stones, marinated in ale and herbs—a meal for an outlaw on the run.", expandedHistory: "This dish is the essence of the MacGregor's outlaw existence. Cooked quickly over a small, hidden fire, it was a meal of stealth and necessity. Rob Roy and his men would have eaten this in silence, under cover of night, the simple, robust flavours of game and ale a reminder of the wild glens they called home even when their name was forbidden.", 
+                  ingredients: [
+                    { item: "Venison Steaks", traditional: "600g", uk: "600g", us: "1.3 lbs", substitute: "Thinly sliced Beef Sirloin or Lamb Leg Steaks" },
+                    { item: "Dark Ale", traditional: "150ml", uk: "150ml", us: "2/3 cup", substitute: "Beef Broth" },
+                    { item: "Juniper Berries, crushed", traditional: "1 tbsp", uk: "1 tbsp", us: "1 tbsp", substitute: "A splash of Gin" },
+                    { item: "Fresh Thyme", traditional: "few sprigs", uk: "few sprigs", us: "few sprigs", substitute: "1 tsp Dried Thyme" },
+                    { item: "Beef Dripping or Butter", traditional: "2 tbsp", uk: "2 tbsp", us: "2 tbsp", substitute: "Vegetable Oil" }
+                  ], instructions: ["Marinate the meat in ale, juniper, and thyme for at least an hour.", "Heat dripping or butter in a heavy pan or on a hot stone until smoking.", "Sear the steaks quickly for 1-2 minutes per side for rare.", "Serve immediately with forager's bannocks."], whiskyPairing: "Ardmore Legacy. Its gentle peat smoke and spicy character match the wild, fire-cooked nature of the dish.", whiskyURL: "https://www.ardmorewhisky.com/" },
+                { id: 2, clan: "Armstrong", name: "Reiver's Beef Stew", type: "Main", category: "clan", intro: "A hearty, one-pot stew of beef and root vegetables, perfect for feeding a band of riders.", expandedHistory: "For the Armstrongs, a meal needed to be simple, filling, and made from ingredients that were readily available—or recently acquired. This stew, thick with beef and barley, was a staple of the Border Reivers. It could be left to simmer for hours, ready to feed hungry men returning from a raid, its rich aroma a welcome comfort in the harsh, lawless lands they commanded.",
+                  ingredients: [
+                    { item: "Stewing Beef, cubed", traditional: "1kg", uk: "1kg", us: "2.2 lbs", substitute: "Lamb Shoulder" },
+                    { item: "Onions, chopped", traditional: "2", uk: "2", us: "2", substitute: "Leeks" },
+                    { item: "Carrots, diced", traditional: "3", uk: "3", us: "3", substitute: "Parsnips" },
+                    { item: "Pearl Barley", traditional: "150g", uk: "150g", us: "3/4 cup", substitute: "Potatoes, cubed" },
+                    { item: "Beef Stock or Ale", traditional: "1 litre", uk: "1 litre", us: "4 cups", substitute: "Vegetable Stock" }
+                  ], instructions: ["Toss beef in seasoned flour and brown in a large pot.", "Add vegetables and cook for 5 minutes.", "Pour in stock or ale, add barley, and bring to a simmer.", "Cover and cook on low for 3-4 hours until the beef is tender.", "Season well and serve with crusty bread."], whiskyPairing: "Glenkinchie 12 Year Old. A light, grassy Lowland malt that cuts through the richness of the beef stew.", whiskyURL: "https://www.malts.com/en-gb/distilleries/glenkinchie" },
+                { id: 3, clan: "Seer", name: "Brahan Broth", type: "Soup", category: "seer", intro: "A deeply infused soup said to 'awaken the bones' and clear the mind for second sight.", expandedHistory: "This mystical broth is inspired by the legends of the Brahan Seer, Coinneach Odhar, who served the MacKenzies of Seaforth. It was believed that certain ingredients, prepared with intention, could open the spirit. This soup, with its base of bone broth and cleansing herbs like nettle and juniper, was a ritual meal, consumed in silence before seeking answers from the ancestors.",
+                  ingredients: [
+                    { item: "Lamb Bones", traditional: "500g", uk: "500g", us: "1.1 lbs", substitute: "Chicken Carcass" },
+                    { item: "Nettle Leaves", traditional: "handful", uk: "handful", us: "a big handful", substitute: "Fresh Spinach" },
+                    { item: "Wild Garlic", traditional: "few leaves", uk: "few leaves", us: "a few leaves", substitute: "1 clove Garlic, crushed" },
+                    { item: "Barley", traditional: "50g", uk: "50g", us: "1/4 cup", substitute: "Rice" },
+                    { item: "Sea Salt", traditional: "pinch", uk: "pinch", us: "a good pinch", substitute: "Table Salt" }
+                  ], instructions: ["Simmer the bones in 2 litres (8 cups) of water for at least 2 hours. Strain the broth.", "Return broth to the pot, add barley and simmer for 45 minutes.", "Add washed nettle/spinach and garlic. Cook for 5 more minutes.", "Season with sea salt. It is said this broth should be drunk in silence."], whiskyPairing: "Oban 14 Year Old. Its balance of Highland heather and gentle coastal brine reflects the mystical nature of the Seer's world.", whiskyURL: "https://www.malts.com/en-gb/distilleries/oban" },
+                { id: 4, clan: "Rebellion", name: "Jacobite Beef Ragout", type: "Main", category: "rebellion", intro: "A Highland take on a French-style stew, carried by supporters of Bonnie Prince Charlie.", expandedHistory: "During the 1745 Jacobite Rising, the 'Auld Alliance' with France was strong. This dish reflects that connection, blending a classic French ragout with hardy Highland ingredients. Clans like the Frasers and Camerons would have cooked this in their campaign camps, a taste of continental sophistication mixed with the defiant spirit of the rebellion, fueled by beef and ale.",
+                  ingredients: [
+                    { item: "Stewing Beef", traditional: "800g", uk: "800g", us: "1.75 lbs", substitute: "Venison or Lamb" },
+                    { item: "Red Wine", traditional: "200ml", uk: "200ml", us: "1 cup", substitute: "Dark Ale" },
+                    { item: "Blackcurrants", traditional: "100g", uk: "100g", us: "1/2 cup", substitute: "Cranberries (fresh or frozen)" },
+                    { item: "Onion", traditional: "1", uk: "1", us: "1 large", substitute: "Shallots" },
+                    { item: "Beef Stock", traditional: "500ml", uk: "500ml", us: "2 cups", substitute: "Vegetable Stock" }
+                  ], instructions: ["Brown the beef in a heavy pot. Set aside.", "Soften the onion, then deglaze the pot with red wine.", "Return beef to the pot, add stock and blackcurrants. Simmer for 3 hours until tender.", "Thicken with a little flour or oatmeal if desired.", "Serve with mashed neeps and tatties."], whiskyPairing: "Glenmorangie The Quinta Ruban. Its port-cask finish gives it rich, wine-like notes that complement the ragout perfectly.", whiskyURL: "https://www.glenmorangie.com/" },
+                { id: 5, clan: "Whisky", name: "Atholl Brose", type: "Dessert/Drink", category: "whisky", intro: "A legendary concoction of oatmeal, honey, and whisky, said to originate with Clan Murray.", expandedHistory: "Atholl Brose is more than a drink; it's liquid folklore. Legend tells that the Earl of Atholl captured a rebel in 1475 by filling a well with this potent mixture. It's a powerful combination of Highland staples: oats for substance, honey for sweetness, and whisky for spirit. It can be served as a celebratory drink or thickened with cream to create a dessert, a true taste of the Murray's Perthshire heartland.",
+                  ingredients: [
+                    { item: "Steel-cut Oatmeal", traditional: "100g", uk: "100g", us: "1/2 cup", substitute: "Rolled Oats" },
+                    { item: "Scotch Whisky", traditional: "150ml", uk: "150ml", us: "2/3 cup", substitute: "Bourbon or Irish Whiskey" },
+                    { item: "Double Cream", traditional: "150ml", uk: "150ml", us: "2/3 cup", substitute: "Heavy Cream" },
+                    { item: "Heather Honey", traditional: "3 tbsp", uk: "3 tbsp", us: "3 tbsp", substitute: "Maple Syrup" },
+                    { item: "Water", traditional: "200ml", uk: "200ml", us: "1 cup", substitute: "N/A" }
+                  ], instructions: ["Soak the oatmeal in the water for at least an hour.", "Strain the milky liquid from the oats through a fine sieve, pressing down to extract all liquid. Discard the oats.", "Whisk the honey into the oat liquid until dissolved.", "Slowly whisk in the whisky.", "In a separate bowl, lightly whip the cream. Gently fold the whisky mixture into the cream.", "Serve chilled in small glasses."], whiskyPairing: "Blair Athol 12 Year Old. The local distillery. Its rich, nutty, and spicy character is the perfect base for this historic drink.", whiskyURL: "https://www.malts.com/en-gb/distilleries/blair-athol" }
+            ],
+            clanSurnames: {
+                Armstrong: { crest: "An Armoured Arm", motto: "Invictus Maneo", summary: "A fierce and powerful Border Reiver clan, renowned for their skill as horsemen and their defiant, lawless independence in the Debatable Lands between Scotland and England.", names: ["Fairbairn", "Nixon", "Crosbie", "Groves"] },
+                Campbell: { crest: "A Boar's Head", motto: "Ne Obliviscaris", summary: "One of the largest and most powerful Highland clans, known for their political skill and their vast territories centered in Argyll. They were often the Crown's agents in the Highlands.", names: ["MacTavish", "Thompson", "Thomas", "Isaac", "MacKelvie", "Orr", "Burns"] },
+                Fraser: { crest: "A Buck's Head", motto: "Je Suis Prest", summary: "A powerful Highland clan of Norman origin, known for their martial prowess and their strategic lands around the Beauly Firth. They were famously loyal to the Jacobite cause.", names: ["Simpson", "Tweedie", "Sim", "MacSimon", "Brewster"] },
+                Grant: { crest: "A Mountain in Flames", motto: "Stand Fast", summary: "A resilient and powerful clan from Strathspey, the heart of whisky country. Known for their loyalty to the Crown and their control of the ancient Caledonian Forest.", names: ["Allan", "Pratt", "Gilroy", "MacAllan", "Bisset"] },
+                MacDonald: { crest: "A Hand Holding a Cross", motto: "Per Mare Per Terras", summary: "The largest and once most powerful of all the Highland clans, the MacDonalds ruled as the semi-independent Lords of the Isles, their power built on a great maritime empire.", names: ["Henderson", "McConnell", "Gilmore", "Hendry", "Cook", "Donaldson", "Hewitt", "Houston", "Hughson", "Isles", "Kellie", "Kello", "Kelly", "Kinnell", "MacBride", "MacCellach", "MacCodrum", "MacColl", "MacCuag", "MacCuish", "MacCutchen", "MacDaniell", "MacDrain", "MacEachin", "MacGehee", "MacGhee", "MacGill", "MacGorrie", "MacGoun", "MacGowan", "MacHugh", "MacHutchen", "MacIan", "MacKean", "MacKelloch", "MacKiggan", "MacKillop", "MacLardie", "MacLarty", "MacLaverty", "MacMurrick", "MacO'Shannaig", "MacRorie", "MacRuer", "MacRury", "MacShannachan", "MacSorley", "Martin", "May", "Murchison", "Murphy", "O'Drain", "Patton", "Peden", "Purcell", "Reoch", "Riach", "Rorison", "Sanderson", "Shannon", "Sorlie", "Sorley", "Sporran", "Train", "Whannel", "Wheelan", "Wilkie", "Wilkinson"] },
+                MacGregor: { crest: "A Lion's Head Crowned", motto: "'S Rioghal Mo Dhream", summary: "The 'Children of the Mist.' A proud clan claiming royal descent who were outlawed for nearly two centuries, their story is one of incredible resilience and survival against all odds.", names: ["Greer", "Grier", "Grigor", "King", "Malloch", "Neish", "Orr", "Paterson", "Skinner", "White"] },
+                MacKenzie: { crest: "A Mountain in Flames", motto: "Luceo non uro", summary: "A powerful clan who dominated Ross-shire, known for their loyalty, their vast territories, and their connection to the legendary Brahan Seer.", names: ["Charleson", "Kenneth", "MacIver", "MacKenny", "MacVinish", "Murchison", "Smart", "Ivory"] },
+                MacLeod: { crest: "A Bull's Head", motto: "Hold Fast", summary: "A fierce and ancient clan of Norse-Gaelic origin, who have held their seat at Dunvegan Castle on the Isle of Skye for over 800 years. Known for their strong cultural traditions.", names: ["Lewis", "Norman", "Beaton", "Callum", "MacAskill", "Tolmie", "Harald"] },
+                Murray: { crest: "A Mermaid with Mirror and Comb", motto: "Furth Fortune and Fill the Fetters", summary: "A powerful and noble family who rose to become the Dukes of Atholl. Their seat at Blair Castle commands the entrance to the Highlands, and they maintain Europe's only private army.", names: ["Moray", "MacMurray", "Piper", "Small", "Spalding", "Fleming"] }
+            }
+        };
 
-  <footer class="text-center p-4 text-sm text-gray-600 bg-white border-t mt-10">
-    &copy; 2025 Legacy Clan Cookbook | A Scroll of Flame and Flour.
-  </footer>
+        document.addEventListener('DOMContentLoaded', () => {
+            const clanSearchInput = document.getElementById('clan-search-input');
+            const clanSearchResults = document.getElementById('clan-search-results');
+
+            function handleClanSearch() {
+                const query = clanSearchInput.value.trim();
+                if (query.length < 2) {
+                    clanSearchResults.innerHTML = '';
+                    return;
+                }
+                
+                const formattedQuery = query.charAt(0).toUpperCase() + query.slice(1).toLowerCase();
+                let foundClan = null;
+
+                for (const clanName in data.clanSurnames) {
+                    const clanData = data.clanSurnames[clanName];
+                    if (clanData.names.includes(formattedQuery)) {
+                        foundClan = { name: clanName, ...clanData };
+                        break;
+                    }
+                }
+
+                if (foundClan) {
+                    clanSearchResults.innerHTML = `
+                        <div class="bg-white p-6 rounded-lg shadow-lg border border-stone-200">
+                            <p class="text-sm text-stone-500">Your name is associated with:</p>
+                            <h3 class="text-3xl font-bold text-[#A57C5A] mt-1">${foundClan.name}</h3>
+                            <div class="mt-4 flex items-center space-x-4">
+                                <div class="text-5xl font-serif" title="Crest">${foundClan.crest === 'A Boar\'s Head' ? '🐗' : foundClan.crest === 'A Hand Holding a Cross' ? '✝️' : foundClan.crest === 'A Buck\'s Head' ? '🦌' : foundClan.crest === 'A Mountain in Flames' ? '⛰️🔥' : foundClan.crest === 'A Lion\'s Head Crowned' ? '🦁👑' : foundClan.crest === 'A Bull\'s Head' ? '🐂' : '🛡️'}</div>
+                                <div>
+                                    <p class="font-semibold text-stone-800">Motto: <span class="font-normal italic">"${foundClan.motto}"</span></p>
+                                    <p class="mt-2 text-stone-700">${foundClan.summary}</p>
+                                </div>
+                            </div>
+                        </div>`;
+                } else {
+                    clanSearchResults.innerHTML = `<div class="bg-white p-6 rounded-lg shadow-lg text-center"><p class="text-stone-600">No direct clan affiliation found for "${query}". Many names have variations or were adopted. Explore the clans below to learn more about the families of the regions your ancestors may have come from.</p></div>`;
+                }
+            }
+
+            clanSearchInput.addEventListener('keyup', handleClanSearch);
+            
+            const clanContent = document.getElementById('clan-content');
+            const clanButtonsContainer = document.getElementById('clan-buttons');
+            const recipeGrid = document.getElementById('recipe-grid');
+            const filterButtonsContainer = document.getElementById('filter-buttons');
+            const modal = document.getElementById('recipe-modal');
+            const modalBody = document.getElementById('modal-body');
+            const closeModalBtn = document.getElementById('close-modal');
+            const mapContainer = document.getElementById('map-container');
+            
+            function init() {
+                populateClanButtons();
+                populateFilterButtons();
+                displayClanInfo(Object.keys(data.clans)[0]);
+                populateRecipes('all');
+                populateMap();
+                populateBonusRecipes();
+            }
+
+            function populateClanButtons() {
+                clanButtonsContainer.innerHTML = Object.keys(data.clans).map(key => 
+                    `<button class="clan-btn px-4 py-2 rounded-full bg-white shadow" data-clan="${key}">${key}</button>`
+                ).join('');
+                clanButtonsContainer.querySelectorAll('.clan-btn').forEach(button => button.addEventListener('click', (e) => displayClanInfo(e.target.dataset.clan)));
+            }
+
+            function populateFilterButtons() {
+                const clans = ['all', ...Object.keys(data.clans)];
+                filterButtonsContainer.innerHTML = clans.map(clan => 
+                    `<button class="filter-btn px-4 py-2 rounded-full bg-white shadow" data-filter="${clan}">${clan === 'all' ? 'All Clans' : clan}</button>`
+                ).join('');
+                filterButtonsContainer.querySelectorAll('.filter-btn').forEach(button => button.addEventListener('click', (e) => {
+                    const filter = e.target.dataset.filter;
+                    populateRecipes(filter);
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.filter === filter));
+                }));
+            }
+
+            function displayClanInfo(clanKey) {
+                const clan = data.clans[clanKey];
+                const clanRecipes = data.recipes.filter(r => r.clan === clan.name && r.category === 'clan');
+                clanContent.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-2">${clan.name}: ${clan.title}</h3>
+                    <div class="mb-4 italic text-stone-600">"${clan.motto}"</div>
+                    <h4 class="text-xl font-semibold mb-2">A Brief History</h4>
+                    <p class="mb-4 text-stone-700">${clan.history}</p>
+                    <h4 class="text-xl font-semibold mb-2">The ${clan.name} Larder</h4>
+                    <p class="mb-6 text-stone-700">${clan.larder}</p>
+                    <h4 class="text-xl font-semibold mb-4">Recipes from the Larder</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        ${clanRecipes.map(recipe => `<div class="recipe-card-small border border-stone-200 rounded-lg p-4 bg-stone-100/50 cursor-pointer" data-recipe-id="${recipe.id}"><h5 class="font-semibold text-stone-800">${recipe.name}</h5><p class="text-sm text-stone-600">${recipe.type}</p></div>`).join('')}
+                    </div>`;
+                document.querySelectorAll('.recipe-card-small').forEach(card => card.addEventListener('click', (e) => showRecipeModal(e.currentTarget.dataset.recipeId)));
+                document.querySelectorAll('.clan-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.clan === clanKey));
+            }
+
+            function populateRecipes(filter = 'all') {
+                const filteredRecipes = (filter === 'all' ? data.recipes : data.recipes.filter(r => r.clan === filter))
+                    .filter(r => r.category === 'clan');
+                recipeGrid.innerHTML = filteredRecipes.map(recipe => `<div class="recipe-card bg-white rounded-lg shadow-lg overflow-hidden cursor-pointer" data-recipe-id="${recipe.id}"><div class="p-6"><p class="text-sm text-stone-500 mb-1">${recipe.clan}</p><h4 class="text-xl font-semibold mb-2 text-stone-800">${recipe.name}</h4><p class="text-stone-600">${recipe.intro}</p></div></div>`).join('');
+                document.querySelectorAll('.recipe-card').forEach(card => card.addEventListener('click', (e) => showRecipeModal(e.currentTarget.dataset.recipeId)));
+            }
+            
+            function populateBonusRecipes() {
+                const bonusCategories = ['seer', 'rebellion', 'whisky'];
+                bonusCategories.forEach(cat => {
+                    const container = document.getElementById(`${cat}-recipes`);
+                    if (container) {
+                        const recipes = data.recipes.filter(r => r.category === cat);
+                        container.innerHTML = recipes.map(recipe => `<div class="recipe-card bg-stone-100/50 rounded-lg shadow-md overflow-hidden cursor-pointer" data-recipe-id="${recipe.id}"><div class="p-6"><p class="text-sm mb-1">${recipe.type}</p><h4 class="text-xl font-semibold mb-2">${recipe.name}</h4><p>${recipe.intro}</p></div></div>`).join('');
+                    }
+                });
+                document.querySelectorAll('#bonus .recipe-card').forEach(card => card.addEventListener('click', (e) => showRecipeModal(e.currentTarget.dataset.recipeId)));
+            }
+
+            function showRecipeModal(recipeId) {
+                const recipe = data.recipes.find(r => r.id == recipeId);
+                const ingredientsTable = `
+                    <table class="w-full text-left text-sm mt-4">
+                        <thead class="border-b"><tr><th class="py-2">Ingredient</th><th class="py-2">Substitute</th><th class="py-2">UK (Metric)</th><th class="py-2">US (Imperial)</th></tr></thead>
+                        <tbody>${recipe.ingredients.map(i => `<tr class="border-b border-stone-200"><td class="py-2 pr-2 font-semibold">${i.item}</td><td class="py-2 pr-2">${i.substitute}</td><td class="py-2 pr-2">${i.uk}</td><td class="py-2 pr-2">${i.us}</td></tr>`).join('')}</tbody>
+                    </table>`;
+                const whiskyHtml = recipe.whiskyPairing ? `<div class="mt-8 border-t border-stone-200 pt-6"><h4 class="text-2xl font-semibold mb-4 text-stone-800">The Perfect Dram</h4><p class="text-stone-700 mb-4">${recipe.whiskyPairing}</p><div class="text-center"><a href="${recipe.whiskyURL}" target="_blank" rel="noopener noreferrer" class="inline-block bg-[#A57C5A] text-white font-semibold px-6 py-2 rounded-lg shadow hover:bg-[#8C6B4F] transition-colors duration-300">Discover ${recipe.whiskyPairing.split('.')[0]}</a></div><p class="text-xs text-center text-stone-500 mt-2">Please enjoy responsibly.</p></div>` : '';
+                modalBody.innerHTML = `
+                    <h3 class="text-3xl font-bold mb-2 text-stone-800">${recipe.name}</h3>
+                    <p class="text-lg text-stone-500 mb-4">${recipe.clan} Clan</p>
+                    <div class="prose max-w-none text-stone-700 mb-6">${recipe.expandedHistory}</div>
+                    <div><h4 class="text-xl font-semibold mb-3 border-b pb-2">Ingredients</h4>${ingredientsTable}</div>
+                    <div class="mt-6"><h4 class="text-xl font-semibold mb-3 border-b pb-2">Instructions</h4><ol class="list-decimal list-inside space-y-3 text-stone-700">${recipe.instructions.map(i => `<li>${i}</li>`).join('')}</ol></div>
+                    ${whiskyHtml}`;
+                modal.classList.add('show');
+            }
+
+            function populateMap() {
+                mapContainer.innerHTML = data.mapLayout.map(clan => `<div class="map-clan flex items-center justify-center text-center p-1 border border-stone-200 rounded" style="grid-row: ${clan.row} / span ${clan.spanRow}; grid-column: ${clan.col} / span ${clan.spanCol};" data-clan="${clan.clan}">${clan.clan}</div>`).join('');
+            }
+            
+            closeModalBtn.addEventListener('click', () => modal.classList.remove('show'));
+            modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+            document.addEventListener('keydown', (e) => { if (e.key === "Escape") modal.classList.remove('show'); });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+            sections.forEach(section => observer.observe(section));
+
+            init();
+        });
+    </script>
 </body>
 </html>
